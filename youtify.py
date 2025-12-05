@@ -3,6 +3,14 @@ Youtify - Bidirectional Spotify <-> YouTube Music sync
 Modern GUI with CustomTkinter
 """
 
+import sys
+import os
+
+# Hide console window on Windows
+if sys.platform == 'win32':
+    import ctypes
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+
 import customtkinter as ctk
 from tkinter import messagebox
 import threading
@@ -414,8 +422,14 @@ class YoutifyApp(ctk.CTk):
         return 1.0 - (matrix[len1][len2] / max(len1, len2))
     
     def tracks_match(self, track1, track2):
-        name1, name2 = self.normalize_string(track1['name']), self.normalize_string(track2['name'])
-        artist1, artist2 = self.normalize_artist(track1['artist']), self.normalize_artist(track2['artist'])
+        if not track1 or not track2:
+            return False
+        name1 = self.normalize_string(track1.get('name', '') or '')
+        name2 = self.normalize_string(track2.get('name', '') or '')
+        artist1 = self.normalize_artist(track1.get('artist', '') or '')
+        artist2 = self.normalize_artist(track2.get('artist', '') or '')
+        if not name1 or not name2:
+            return False
         if name1 == name2 and artist1 == artist2:
             return True
         name_ratio = self.levenshtein_ratio(name1, name2)
@@ -439,9 +453,13 @@ class YoutifyApp(ctk.CTk):
             for item in items:
                 track = item.get('track')
                 if track and track.get('name'):
+                    artist = "Unknown"
+                    artists = track.get('artists')
+                    if artists and len(artists) > 0 and artists[0]:
+                        artist = artists[0].get('name', 'Unknown') or 'Unknown'
                     tracks.append({
                         "name": track['name'],
-                        "artist": track['artists'][0]['name'] if track.get('artists') else "Unknown",
+                        "artist": artist,
                     })
             if not results.get('next'):
                 break
@@ -453,9 +471,13 @@ class YoutifyApp(ctk.CTk):
         tracks = []
         for track in playlist.get('tracks', []):
             if track and track.get('title'):
+                artist = "Unknown"
+                artists = track.get('artists')
+                if artists and len(artists) > 0 and artists[0]:
+                    artist = artists[0].get('name', 'Unknown') or 'Unknown'
                 tracks.append({
                     "name": track['title'],
-                    "artist": track['artists'][0]['name'] if track.get('artists') else "Unknown",
+                    "artist": artist,
                 })
         return tracks
     
