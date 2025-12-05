@@ -9,7 +9,7 @@
 
 **Sync your playlists between Spotify and YouTube Music with one click!**
 
-[🚀 Installation](#-installation) • [⚙️ Configuration](#️-configuration) • [📖 Usage](#-usage) • [🤝 Contributing](#-contributing)
+[🚀 Installation](#-installation) • [⚙️ Configuration](#️-configuration) • [📖 Usage](#-usage) 
 
 </div>
 
@@ -172,15 +172,6 @@ youtify/
 | `ytmusicapi`    | ≥1.11   | YouTube Music API              |
 | `python-dotenv` | ≥1.0    | Environment variables handling |
 
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the project
-2. Create your branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## ⚠️ Disclaimer
 
@@ -188,6 +179,7 @@ This project is not affiliated with Spotify or YouTube/Google. Use it responsibl
 
 ## 💖 Acknowledgments
 
+- Inspired by [PlaySync](https://github.com/makalin/PlaySync) - Original playlist sync project
 - [spotipy](https://github.com/spotipy-dev/spotipy) - Python wrapper for Spotify API
 - [ytmusicapi](https://github.com/sigma67/ytmusicapi) - Unofficial YouTube Music API
 - [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) - Modern GUI framework
