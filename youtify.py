@@ -1,6 +1,6 @@
 """
-Youtify - Synchronisation bidirectionnelle Spotify <-> YouTube Music
-Interface graphique moderne avec CustomTkinter
+Youtify - Bidirectional Spotify <-> YouTube Music sync
+Modern GUI with CustomTkinter
 """
 
 import customtkinter as ctk
@@ -14,15 +14,11 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from ytmusicapi import YTMusic
 
-# Configuration du thème
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
-# Constantes
 ENV_FILE = os.path.join(os.path.dirname(__file__), ".env")
 SIMILARITY_THRESHOLD = 0.75
-
-# Couleurs personnalisées
 SPOTIFY_GREEN = "#1DB954"
 SPOTIFY_GREEN_HOVER = "#1ed760"
 YOUTUBE_RED = "#FF0000"
@@ -37,36 +33,28 @@ class YoutifyApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         
-        # Configuration de la fenêtre
         self.title("🎵 Youtify")
         self.geometry("1100x800")
         self.configure(fg_color=DARK_BG)
         self.resizable(True, True)
         self.minsize(900, 700)
         
-        # Variables
         self.spotify_client = None
         self.youtube_client = None
         self.is_syncing = False
         self.spotify_tracks = []
         self.youtube_tracks = []
         
-        # Charger les variables d'environnement existantes
         load_dotenv(ENV_FILE)
-        
-        # Créer l'interface
         self.create_widgets()
         self.load_saved_config()
     
     def create_widgets(self):
-        """Crée tous les widgets de l'interface."""
-        
-        # === HEADER ===
+        # Header
         header_frame = ctk.CTkFrame(self, fg_color="transparent", height=80)
         header_frame.pack(fill="x", padx=30, pady=(20, 10))
         header_frame.pack_propagate(False)
         
-        # Logo et titre
         title_container = ctk.CTkFrame(header_frame, fg_color="transparent")
         title_container.pack(side="left")
         
@@ -86,7 +74,6 @@ class YoutifyApp(ctk.CTk):
         )
         subtitle_label.pack(side="left", padx=(10, 0), pady=(12, 0))
         
-        # Bouton config
         self.config_btn = ctk.CTkButton(
             header_frame,
             text="⚙️ Configuration",
@@ -99,25 +86,22 @@ class YoutifyApp(ctk.CTk):
         )
         self.config_btn.pack(side="right")
         
-        # === CONFIG PANEL (caché par défaut) ===
+        # Config panel
         self.config_frame = ctk.CTkFrame(self, fg_color=CARD_BG, corner_radius=15)
         self.config_visible = False
         
         config_inner = ctk.CTkFrame(self.config_frame, fg_color="transparent")
         config_inner.pack(fill="x", padx=20, pady=15)
         
-        # Titre config
         ctk.CTkLabel(
             config_inner,
             text="🔐 Configuration API",
             font=ctk.CTkFont(size=18, weight="bold")
         ).pack(anchor="w", pady=(0, 15))
         
-        # Grid pour les entrées
         entries_frame = ctk.CTkFrame(config_inner, fg_color="transparent")
         entries_frame.pack(fill="x")
         
-        # Spotify
         spotify_config = ctk.CTkFrame(entries_frame, fg_color=CARD_BG_LIGHT, corner_radius=10)
         spotify_config.pack(side="left", fill="both", expand=True, padx=(0, 10))
         
@@ -129,21 +113,19 @@ class YoutifyApp(ctk.CTk):
         self.spotify_secret_entry = ctk.CTkEntry(spotify_config, placeholder_text="Client Secret", show="•", height=35)
         self.spotify_secret_entry.pack(fill="x", padx=15, pady=(5, 15))
         
-        # YouTube
         youtube_config = ctk.CTkFrame(entries_frame, fg_color=CARD_BG_LIGHT, corner_radius=10)
         youtube_config.pack(side="left", fill="both", expand=True, padx=(10, 0))
         
         ctk.CTkLabel(youtube_config, text="🔴 YouTube Music", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.youtube_auth_entry = ctk.CTkEntry(youtube_config, placeholder_text="Chemin vers browser.json", height=35)
+        self.youtube_auth_entry = ctk.CTkEntry(youtube_config, placeholder_text="Path to browser.json", height=35)
         self.youtube_auth_entry.pack(fill="x", padx=15, pady=5)
         
-        ctk.CTkLabel(youtube_config, text="", height=35).pack(fill="x", padx=15, pady=(5, 15))  # Spacer
+        ctk.CTkLabel(youtube_config, text="", height=35).pack(fill="x", padx=15, pady=(5, 15))
         
-        # Bouton sauvegarder
         ctk.CTkButton(
             config_inner,
-            text="💾 Sauvegarder",
+            text="💾 Save",
             command=self.save_config,
             width=150,
             height=35,
@@ -151,11 +133,9 @@ class YoutifyApp(ctk.CTk):
             hover_color="#5a73f0"
         ).pack(pady=(15, 0))
         
-        # === MAIN CONTENT ===
         main_frame = ctk.CTkFrame(self, fg_color="transparent")
         main_frame.pack(fill="both", expand=True, padx=30, pady=10)
         
-        # === PLAYLIST INPUTS ===
         input_frame = ctk.CTkFrame(main_frame, fg_color=CARD_BG, corner_radius=15, height=120)
         input_frame.pack(fill="x", pady=(0, 15))
         input_frame.pack_propagate(False)
@@ -163,7 +143,6 @@ class YoutifyApp(ctk.CTk):
         input_inner = ctk.CTkFrame(input_frame, fg_color="transparent")
         input_inner.pack(fill="both", expand=True, padx=20, pady=15)
         
-        # Spotify input
         spotify_input_frame = ctk.CTkFrame(input_inner, fg_color="transparent")
         spotify_input_frame.pack(side="left", fill="both", expand=True, padx=(0, 15))
         
@@ -182,14 +161,12 @@ class YoutifyApp(ctk.CTk):
         )
         self.spotify_playlist_entry.pack(fill="x", pady=(10, 0))
         
-        # Séparateur
         sep_frame = ctk.CTkFrame(input_inner, fg_color="transparent", width=60)
         sep_frame.pack(side="left")
         sep_frame.pack_propagate(False)
         
         ctk.CTkLabel(sep_frame, text="⟷", font=ctk.CTkFont(size=30), text_color="#666").pack(expand=True)
         
-        # YouTube input
         youtube_input_frame = ctk.CTkFrame(input_inner, fg_color="transparent")
         youtube_input_frame.pack(side="left", fill="both", expand=True, padx=(15, 0))
         
@@ -208,11 +185,9 @@ class YoutifyApp(ctk.CTk):
         )
         self.youtube_playlist_entry.pack(fill="x", pady=(10, 0))
         
-        # === PLAYLISTS COMPARISON ===
         comparison_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
         comparison_frame.pack(fill="both", expand=True, pady=(0, 15))
         
-        # Spotify tracks panel
         spotify_panel = ctk.CTkFrame(comparison_frame, fg_color=CARD_BG, corner_radius=15)
         spotify_panel.pack(side="left", fill="both", expand=True, padx=(0, 8))
         
@@ -222,7 +197,7 @@ class YoutifyApp(ctk.CTk):
         
         self.spotify_header_label = ctk.CTkLabel(
             spotify_header,
-            text="🟢 SPOTIFY • 0 morceaux",
+            text="🟢 SPOTIFY • 0 tracks",
             font=ctk.CTkFont(size=14, weight="bold"),
             text_color="#000000"
         )
@@ -235,10 +210,9 @@ class YoutifyApp(ctk.CTk):
             corner_radius=10
         )
         self.spotify_list.pack(fill="both", expand=True, padx=10, pady=(0, 10))
-        self.spotify_list.insert("1.0", "Entrez un lien de playlist Spotify\net cliquez sur Charger...")
+        self.spotify_list.insert("1.0", "Enter a Spotify playlist link\nand click Load...")
         self.spotify_list.configure(state="disabled")
         
-        # YouTube tracks panel
         youtube_panel = ctk.CTkFrame(comparison_frame, fg_color=CARD_BG, corner_radius=15)
         youtube_panel.pack(side="left", fill="both", expand=True, padx=(8, 0))
         
@@ -248,7 +222,7 @@ class YoutifyApp(ctk.CTk):
         
         self.youtube_header_label = ctk.CTkLabel(
             youtube_header,
-            text="🔴 YOUTUBE MUSIC • 0 morceaux",
+            text="🔴 YOUTUBE MUSIC • 0 tracks",
             font=ctk.CTkFont(size=14, weight="bold"),
             text_color="#ffffff"
         )
@@ -261,10 +235,9 @@ class YoutifyApp(ctk.CTk):
             corner_radius=10
         )
         self.youtube_list.pack(fill="both", expand=True, padx=10, pady=(0, 10))
-        self.youtube_list.insert("1.0", "Entrez un lien de playlist YouTube\net cliquez sur Charger...")
+        self.youtube_list.insert("1.0", "Enter a YouTube playlist link\nand click Load...")
         self.youtube_list.configure(state="disabled")
         
-        # === ACTION BUTTONS ===
         action_frame = ctk.CTkFrame(main_frame, fg_color=CARD_BG, corner_radius=15, height=80)
         action_frame.pack(fill="x", pady=(0, 10))
         action_frame.pack_propagate(False)
@@ -272,10 +245,9 @@ class YoutifyApp(ctk.CTk):
         action_inner = ctk.CTkFrame(action_frame, fg_color="transparent")
         action_inner.pack(expand=True)
         
-        # Bouton charger
         self.load_btn = ctk.CTkButton(
             action_inner,
-            text="📥 Charger les playlists",
+            text="📥 Load playlists",
             command=self.load_playlists,
             width=200,
             height=50,
@@ -286,10 +258,9 @@ class YoutifyApp(ctk.CTk):
         )
         self.load_btn.pack(side="left", padx=10)
         
-        # Bouton sync
         self.sync_button = ctk.CTkButton(
             action_inner,
-            text="🔄 Synchroniser",
+            text="🔄 Sync",
             command=self.start_sync,
             width=200,
             height=50,
@@ -300,21 +271,18 @@ class YoutifyApp(ctk.CTk):
         )
         self.sync_button.pack(side="left", padx=10)
         
-        # Progress bar
         self.progress_bar = ctk.CTkProgressBar(action_inner, width=200, height=15, corner_radius=5)
         self.progress_bar.pack(side="left", padx=20)
         self.progress_bar.set(0)
         
-        # Status label
         self.status_label = ctk.CTkLabel(
             action_inner,
-            text="Prêt",
+            text="Ready",
             font=ctk.CTkFont(size=13),
             text_color="#888888"
         )
         self.status_label.pack(side="left", padx=10)
         
-        # === LOG PANEL ===
         log_frame = ctk.CTkFrame(main_frame, fg_color=CARD_BG, corner_radius=15, height=120)
         log_frame.pack(fill="x")
         log_frame.pack_propagate(False)
@@ -322,11 +290,11 @@ class YoutifyApp(ctk.CTk):
         log_header = ctk.CTkFrame(log_frame, fg_color="transparent")
         log_header.pack(fill="x", padx=15, pady=(10, 5))
         
-        ctk.CTkLabel(log_header, text="📋 Journal des opérations", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left")
+        ctk.CTkLabel(log_header, text="📋 Log", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left")
         
         ctk.CTkButton(
             log_header,
-            text="Effacer",
+            text="Clear",
             command=self.clear_log,
             width=60,
             height=25,
@@ -345,7 +313,6 @@ class YoutifyApp(ctk.CTk):
         self.log_textbox.pack(fill="both", expand=True, padx=15, pady=(0, 10))
     
     def toggle_config(self):
-        """Affiche/cache le panneau de configuration."""
         if self.config_visible:
             self.config_frame.pack_forget()
             self.config_visible = False
@@ -353,31 +320,26 @@ class YoutifyApp(ctk.CTk):
         else:
             self.config_frame.pack(fill="x", padx=30, pady=(0, 10), after=self.winfo_children()[0])
             self.config_visible = True
-            self.config_btn.configure(text="✕ Fermer")
+            self.config_btn.configure(text="✕ Close")
     
     def clear_log(self):
-        """Efface le journal."""
         self.log_textbox.delete("1.0", "end")
     
     def log(self, message):
-        """Ajoute un message au journal."""
         self.log_textbox.insert("end", f"{message}\n")
         self.log_textbox.see("end")
         self.update()
     
     def update_status(self, text, color="#888888"):
-        """Met à jour le label de statut."""
         self.status_label.configure(text=text, text_color=color)
         self.update()
     
     def load_saved_config(self):
-        """Charge la configuration sauvegardée."""
         self.spotify_id_entry.insert(0, os.getenv("SPOTIFY_CLIENT_ID", ""))
         self.spotify_secret_entry.insert(0, os.getenv("SPOTIFY_CLIENT_SECRET", ""))
         self.youtube_auth_entry.insert(0, os.getenv("YOUTUBE_AUTH_FILE", "browser.json"))
     
     def save_config(self):
-        """Sauvegarde la configuration dans le fichier .env."""
         try:
             if not os.path.exists(ENV_FILE):
                 with open(ENV_FILE, "w") as f:
@@ -387,11 +349,11 @@ class YoutifyApp(ctk.CTk):
             set_key(ENV_FILE, "SPOTIFY_CLIENT_SECRET", self.spotify_secret_entry.get())
             set_key(ENV_FILE, "YOUTUBE_AUTH_FILE", self.youtube_auth_entry.get())
             
-            self.log("✅ Configuration sauvegardée")
-            self.update_status("Configuration sauvegardée", SPOTIFY_GREEN)
+            self.log("✅ Configuration saved")
+            self.update_status("Configuration saved", SPOTIFY_GREEN)
         except Exception as e:
-            self.log(f"❌ Erreur: {e}")
-            messagebox.showerror("Erreur", f"Impossible de sauvegarder: {e}")
+            self.log(f"❌ Error: {e}")
+            messagebox.showerror("Error", f"Unable to save: {e}")
     
     def extract_spotify_id(self, url):
         if "spotify.com" in url:
@@ -506,7 +468,6 @@ class YoutifyApp(ctk.CTk):
         return missing
     
     def update_track_list(self, textbox, tracks, header_label, platform, missing=None):
-        """Met à jour la liste des morceaux avec coloration."""
         textbox.configure(state="normal")
         textbox.delete("1.0", "end")
         
@@ -522,38 +483,36 @@ class YoutifyApp(ctk.CTk):
         
         textbox.configure(state="disabled")
         
-        # Update header
         count = len(tracks)
         missing_count = len(missing) if missing else 0
         if platform == "spotify":
-            text = f"🟢 SPOTIFY • {count} morceaux"
+            text = f"🟢 SPOTIFY • {count} tracks"
             if missing_count > 0:
-                text += f" (+{missing_count} à ajouter)"
+                text += f" (+{missing_count} to add)"
             header_label.configure(text=text)
         else:
-            text = f"🔴 YOUTUBE MUSIC • {count} morceaux"
+            text = f"🔴 YOUTUBE MUSIC • {count} tracks"
             if missing_count > 0:
-                text += f" (+{missing_count} à ajouter)"
+                text += f" (+{missing_count} to add)"
             header_label.configure(text=text)
     
     def load_playlists(self):
-        """Charge les playlists sans synchroniser."""
         if not self.spotify_id_entry.get() or not self.spotify_secret_entry.get():
-            messagebox.showerror("Erreur", "Configurez vos identifiants Spotify d'abord !")
+            messagebox.showerror("Error", "Configure your Spotify credentials first!")
             self.toggle_config()
             return
         
         if not self.spotify_playlist_entry.get() or not self.youtube_playlist_entry.get():
-            messagebox.showerror("Erreur", "Entrez les liens des deux playlists !")
+            messagebox.showerror("Error", "Enter both playlist links!")
             return
         
-        self.load_btn.configure(state="disabled", text="⏳ Chargement...")
+        self.load_btn.configure(state="disabled", text="⏳ Loading...")
         thread = threading.Thread(target=self._load_playlists_thread, daemon=True)
         thread.start()
     
     def _load_playlists_thread(self):
         try:
-            self.update_status("Connexion à Spotify...", ACCENT_BLUE)
+            self.update_status("Connecting to Spotify...", ACCENT_BLUE)
             self.progress_bar.set(0.1)
             
             self.spotify_client = spotipy.Spotify(auth_manager=SpotifyOAuth(
@@ -562,31 +521,31 @@ class YoutifyApp(ctk.CTk):
                 redirect_uri="http://127.0.0.1:8888/callback",
                 scope="playlist-read-private playlist-modify-public playlist-modify-private"
             ))
-            self.log("✅ Spotify connecté")
+            self.log("✅ Spotify connected")
             
-            self.update_status("Connexion à YouTube Music...", ACCENT_BLUE)
+            self.update_status("Connecting to YouTube Music...", ACCENT_BLUE)
             self.progress_bar.set(0.2)
             
             auth_file = self.youtube_auth_entry.get()
             if not os.path.isabs(auth_file):
                 auth_file = os.path.join(os.path.dirname(__file__), auth_file)
             self.youtube_client = YTMusic(auth_file)
-            self.log("✅ YouTube Music connecté")
+            self.log("✅ YouTube Music connected")
             
-            self.update_status("Chargement Spotify...", SPOTIFY_GREEN)
+            self.update_status("Loading Spotify...", SPOTIFY_GREEN)
             self.progress_bar.set(0.4)
             
             self.spotify_tracks = self.get_spotify_tracks(self.spotify_playlist_entry.get())
-            self.log(f"📗 Spotify: {len(self.spotify_tracks)} morceaux")
+            self.log(f"📗 Spotify: {len(self.spotify_tracks)} tracks")
             
-            self.update_status("Chargement YouTube...", YOUTUBE_RED)
+            self.update_status("Loading YouTube...", YOUTUBE_RED)
             self.progress_bar.set(0.6)
             
             youtube_id = self.extract_youtube_id(self.youtube_playlist_entry.get())
             self.youtube_tracks = self.get_youtube_tracks(youtube_id)
-            self.log(f"📕 YouTube: {len(self.youtube_tracks)} morceaux")
+            self.log(f"📕 YouTube: {len(self.youtube_tracks)} tracks")
             
-            self.update_status("Analyse des différences...", ACCENT_BLUE)
+            self.update_status("Analyzing differences...", ACCENT_BLUE)
             self.progress_bar.set(0.8)
             
             missing_on_youtube = self.find_missing_tracks(self.spotify_tracks, self.youtube_tracks)
@@ -594,34 +553,33 @@ class YoutifyApp(ctk.CTk):
             
             self.log(f"🔄 {len(missing_on_youtube)} → YouTube | {len(missing_on_spotify)} → Spotify")
             
-            # Mise à jour des listes
             self.update_track_list(self.spotify_list, self.spotify_tracks, self.spotify_header_label, "spotify", missing_on_spotify)
             self.update_track_list(self.youtube_list, self.youtube_tracks, self.youtube_header_label, "youtube", missing_on_youtube)
             
             self.progress_bar.set(1.0)
             
             if not missing_on_youtube and not missing_on_spotify:
-                self.update_status("✨ Playlists synchronisées !", SPOTIFY_GREEN)
+                self.update_status("✨ Playlists synced!", SPOTIFY_GREEN)
             else:
-                self.update_status(f"Prêt à synchroniser ({len(missing_on_youtube) + len(missing_on_spotify)} morceaux)", SPOTIFY_GREEN)
+                self.update_status(f"Ready to sync ({len(missing_on_youtube) + len(missing_on_spotify)} tracks)", SPOTIFY_GREEN)
             
         except Exception as e:
-            self.log(f"❌ Erreur: {e}")
-            self.update_status("Erreur", YOUTUBE_RED)
-            messagebox.showerror("Erreur", str(e))
+            self.log(f"❌ Error: {e}")
+            self.update_status("Error", YOUTUBE_RED)
+            messagebox.showerror("Error", str(e))
         finally:
-            self.load_btn.configure(state="normal", text="📥 Charger les playlists")
+            self.load_btn.configure(state="normal", text="📥 Load playlists")
     
     def start_sync(self):
         if self.is_syncing:
             return
         
         if not self.spotify_tracks or not self.youtube_tracks:
-            messagebox.showinfo("Info", "Chargez d'abord les playlists !")
+            messagebox.showinfo("Info", "Load playlists first!")
             return
         
         self.is_syncing = True
-        self.sync_button.configure(state="disabled", text="⏳ Synchronisation...")
+        self.sync_button.configure(state="disabled", text="⏳ Syncing...")
         thread = threading.Thread(target=self._sync_thread, daemon=True)
         thread.start()
     
@@ -635,14 +593,13 @@ class YoutifyApp(ctk.CTk):
             
             total = len(missing_on_youtube) + len(missing_on_spotify)
             if total == 0:
-                self.update_status("✨ Déjà synchronisé !", SPOTIFY_GREEN)
+                self.update_status("✨ Already synced!", SPOTIFY_GREEN)
                 return
             
             done = 0
             
-            # Sync vers YouTube
             if missing_on_youtube:
-                self.log(f"\n➡️ Ajout de {len(missing_on_youtube)} morceaux sur YouTube...")
+                self.log(f"\n➡️ Adding {len(missing_on_youtube)} tracks to YouTube...")
                 for track in missing_on_youtube:
                     try:
                         query = f"{track['name']} {track['artist']}"
@@ -651,16 +608,15 @@ class YoutifyApp(ctk.CTk):
                             self.youtube_client.add_playlist_items(youtube_id, [results[0]['videoId']])
                             self.log(f"   ✅ {track['name'][:35]} - {track['artist'][:20]}")
                         else:
-                            self.log(f"   ⚠️ Non trouvé: {track['name'][:35]}")
+                            self.log(f"   ⚠️ Not found: {track['name'][:35]}")
                     except Exception as e:
                         self.log(f"   ❌ {track['name'][:35]}")
                     done += 1
                     self.progress_bar.set(done / total)
                     self.update_status(f"YouTube: {done}/{total}", YOUTUBE_RED)
             
-            # Sync vers Spotify
             if missing_on_spotify:
-                self.log(f"\n➡️ Ajout de {len(missing_on_spotify)} morceaux sur Spotify...")
+                self.log(f"\n➡️ Adding {len(missing_on_spotify)} tracks to Spotify...")
                 track_ids = []
                 for track in missing_on_spotify:
                     try:
@@ -670,7 +626,7 @@ class YoutifyApp(ctk.CTk):
                             track_ids.append(result['tracks']['items'][0]['id'])
                             self.log(f"   ✅ {track['name'][:35]} - {track['artist'][:20]}")
                         else:
-                            self.log(f"   ⚠️ Non trouvé: {track['name'][:35]}")
+                            self.log(f"   ⚠️ Not found: {track['name'][:35]}")
                     except:
                         self.log(f"   ❌ {track['name'][:35]}")
                     done += 1
@@ -678,24 +634,22 @@ class YoutifyApp(ctk.CTk):
                     self.update_status(f"Spotify: {done}/{total}", SPOTIFY_GREEN)
                 
                 if track_ids:
-                    # Spotify limite à 100 tracks par requête
                     for i in range(0, len(track_ids), 100):
                         self.spotify_client.playlist_add_items(spotify_id, track_ids[i:i+100])
             
             self.progress_bar.set(1.0)
             self.log("\n" + "=" * 50)
-            self.log("✨ Synchronisation terminée !")
-            self.update_status("✨ Synchronisation terminée !", SPOTIFY_GREEN)
+            self.log("✨ Sync completed!")
+            self.update_status("✨ Sync completed!", SPOTIFY_GREEN)
             
-            # Recharger les playlists
             self._load_playlists_thread()
             
         except Exception as e:
-            self.log(f"❌ Erreur: {e}")
-            self.update_status("Erreur", YOUTUBE_RED)
+            self.log(f"❌ Error: {e}")
+            self.update_status("Error", YOUTUBE_RED)
         finally:
             self.is_syncing = False
-            self.sync_button.configure(state="normal", text="🔄 Synchroniser")
+            self.sync_button.configure(state="normal", text="🔄 Sync")
 
 
 if __name__ == "__main__":

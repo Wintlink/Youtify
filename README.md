@@ -4,117 +4,118 @@
 
 <img src="Youtify.png" alt="Youtify Logo" width="200"/>
 
-![Youtify Logo](https://img.shields.io/badge/Youtify-v1.0-1DB954?style=for-the-badge&logo=spotify&logoColor=white)
+![Youtify](https://img.shields.io/badge/Youtify-v1.0-1DB954?style=for-the-badge&logo=spotify&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-**Synchronisez vos playlists entre Spotify et YouTube Music en un clic !**
+**Sync your playlists between Spotify and YouTube Music with one click!**
 
-[🚀 Installation](#-installation) • [⚙️ Configuration](#️-configuration) • [📖 Utilisation](#-utilisation) • [🤝 Contribuer](#-contribuer)
+[🚀 Installation](#-installation) • [⚙️ Configuration](#️-configuration) • [📖 Usage](#-usage) • [🤝 Contributing](#-contributing)
 
 </div>
 
 ---
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-- 🔄 **Synchronisation bidirectionnelle** - Les morceaux manquants sont ajoutés des deux côtés
-- 🎯 **Détection intelligente** - Algorithme avancé pour éviter les doublons (même avec des titres légèrement différents)
-- 🖥️ **Interface graphique moderne** - Simple et intuitive, pas besoin de ligne de commande
-- 💾 **Sauvegarde de configuration** - Vos identifiants sont stockés localement
-- 📊 **Journal en temps réel** - Suivez la progression de la synchronisation
+- 🔄 **Bidirectional sync** - Missing tracks are added on both sides
+- 🎯 **Smart detection** - Advanced algorithm to avoid duplicates (even with slightly different titles)
+- 🖥️ **Modern GUI** - Simple and intuitive, no command line needed
+- 💾 **Config saving** - Your credentials are stored locally
+- 📊 **Real-time logging** - Track the sync progress live
 
-## 📸 Aperçu
+## 📸 Overview
 
-L'interface graphique vous permet de :
+The graphical interface allows you to:
 
-1. Configurer vos identifiants API une seule fois
-2. Coller les liens de vos playlists
-3. Cliquer sur "Synchroniser" et c'est parti !
+1. Configure your API credentials once
+2. Paste your playlist links
+3. Click "Synchronize" and you're done!
 
 ## 🚀 Installation
 
-### Prérequis
+### Prerequisites
 
-- Python 3.8 ou supérieur
-- Un compte Spotify Developer
-- Un compte YouTube Music
+- Python 3.8 or higher
+- A Spotify Developer account
+- A YouTube Music account
 
-### Étapes
+### Steps
 
-1. **Clonez le repository**
+1. **Clone the repository**
 
 ```bash
-git clone https://github.com/votre-nom/youtify.git
+git clone https://github.com/yourusername/youtify.git
 cd youtify
 ```
 
-2. **Installez les dépendances**
+2. **Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Lancez l'application**
+3. **Launch the application**
 
 ```bash
 python youtify.py
 ```
 
-Ou double-cliquez sur `Youtify.bat` (Windows)
+Or double-click on `Youtify.bat` (Windows)
 
 ## ⚙️ Configuration
 
 ### 1. Spotify API
 
-1. Allez sur [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Créez une nouvelle application
-3. Notez le **Client ID** et **Client Secret**
-4. Dans les paramètres de l'app, ajoutez `http://127.0.0.1:8888/callback` comme Redirect URI
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create a new application
+3. Note the **Client ID** and **Client Secret**
+4. In the app settings, add `http://127.0.0.1:8888/callback` as Redirect URI
 
 ### 2. YouTube Music API
 
-1. Ouvrez [YouTube Music](https://music.youtube.com) dans votre navigateur (connecté à votre compte)
-2. Ouvrez les outils de développement (F12)
-3. Allez dans l'onglet **Network** (Réseau)
-4. Jouez une chanson ou naviguez sur le site
-5. Cherchez une requête vers `music.youtube.com`
-6. Exécutez cette commande dans votre terminal :
+1. Open [YouTube Music](https://music.youtube.com) in your browser (logged in to your account)
+2. Open developer tools (F12)
+3. Go to the **Network** tab
+4. Play a song or navigate on the site
+5. Look for a request to `music.youtube.com`
+6. Run this command in your terminal:
 
 ```bash
 ytmusicapi browser
 ```
 
-7. Suivez les instructions pour créer le fichier `browser.json`
+7. Follow the instructions to create the `browser.json` file
 
-### 3. Dans Youtify
+### 3. In Youtify
 
-1. Lancez l'application
-2. Entrez vos identifiants Spotify
-3. Indiquez le chemin vers `browser.json`
-4. Cliquez sur "Sauvegarder la configuration"
+1. Launch the application
+2. Enter your Spotify credentials
+3. Specify the path to `browser.json`
+4. Click "Save configuration"
 
-## 📖 Utilisation
+## 📖 Usage
 
-1. **Lancez Youtify** (`python youtify.py` ou `Youtify.bat`)
+1. **Launch Youtify** (`python youtify.py` or `Youtify.bat`)
 
-2. **Entrez les liens de vos playlists :**
+2. **Enter your playlist links:**
 
-   - Spotify : `https://open.spotify.com/playlist/xxxxx`
-   - YouTube Music : `https://music.youtube.com/playlist?list=xxxxx`
+   - Spotify: `https://open.spotify.com/playlist/xxxxx`
+   - YouTube Music: `https://music.youtube.com/playlist?list=xxxxx`
 
-3. **Cliquez sur "Synchroniser"**
+3. **Click "Load playlists"** to see the comparison
 
-4. **Suivez la progression** dans le journal
+4. **Click "Synchronize"** to sync both playlists
 
-L'algorithme compare intelligemment les titres pour :
+5. **Track the progress** in the log panel
 
-- Ignorer les différences de casse (majuscules/minuscules)
-- Ignorer les accents (é → e)
-- Ignorer les suffixes (Remastered, Live, Radio Edit...)
-- Détecter les titres similaires à 75%+
+The algorithm intelligently compares titles to:
 
-## 🛠️ Comment ça fonctionne
+- Ignore case differences (uppercase/lowercase)
+- Ignore accents (é → e)
+- Ignore suffixes (Remastered, Live, Radio Edit...)
+- Detect similar titles at 75%+ match
+
+## 🛠️ How it works
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -128,79 +129,73 @@ L'algorithme compare intelligemment les titres pour :
 │          │                         │                    │
 │          ▼                         ▼                    │
 │   ┌──────────────────────────────────────────┐         │
-│   │         Comparaison intelligente          │         │
-│   │  • Normalisation des titres               │         │
-│   │  • Algorithme de similarité Levenshtein   │         │
-│   │  • Détection des doublons                 │         │
+│   │         Smart comparison                  │         │
+│   │  • Title normalization                    │         │
+│   │  • Levenshtein similarity algorithm       │         │
+│   │  • Duplicate detection                    │         │
 │   └──────────────────────────────────────────┘         │
 │          │                         │                    │
 │          ▼                         ▼                    │
 │   ┌─────────────┐           ┌─────────────┐            │
-│   │  Morceaux   │           │  Morceaux   │            │
-│   │  manquants  │           │  manquants  │            │
-│   │  sur YTM    │           │  sur Spotify│            │
+│   │   Missing   │           │   Missing   │            │
+│   │   tracks    │           │   tracks    │            │
+│   │   on YTM    │           │  on Spotify │            │
 │   └─────────────┘           └─────────────┘            │
 │          │                         │                    │
 │          ▼                         ▼                    │
 │   ┌──────────────────────────────────────────┐         │
-│   │          Ajout automatique                │         │
+│   │          Automatic addition               │         │
 │   └──────────────────────────────────────────┘         │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
-## 📁 Structure du projet
+## 📁 Project structure
 
 ```
 youtify/
-├── youtify.py          # Application principale avec GUI
-├── browser.json        # Authentification YouTube (à créer)
-├── .env                # Configuration (généré automatiquement)
-├── requirements.txt    # Dépendances Python
-├── Youtify.bat         # Lanceur Windows
-├── LICENSE             # Licence MIT
-└── README.md           # Ce fichier
+├── youtify.py          # Main application with GUI
+├── browser.json        # YouTube authentication (to create)
+├── .env                # Configuration (auto-generated)
+├── requirements.txt    # Python dependencies
+├── Youtify.bat         # Windows launcher
+├── Youtify.png         # Logo
+└── README.md           # This file
 ```
 
-## 🔧 Dépendances
+## 🔧 Dependencies
 
-| Package         | Version | Description                           |
-| --------------- | ------- | ------------------------------------- |
-| `customtkinter` | ≥5.0    | Interface graphique moderne           |
-| `spotipy`       | ≥2.23   | API Spotify                           |
-| `ytmusicapi`    | ≥1.11   | API YouTube Music                     |
-| `python-dotenv` | ≥1.0    | Gestion des variables d'environnement |
+| Package         | Version | Description                    |
+| --------------- | ------- | ------------------------------ |
+| `customtkinter` | ≥5.0    | Modern GUI framework           |
+| `spotipy`       | ≥2.23   | Spotify API wrapper            |
+| `ytmusicapi`    | ≥1.11   | YouTube Music API              |
+| `python-dotenv` | ≥1.0    | Environment variables handling |
 
-## 🤝 Contribuer
+## 🤝 Contributing
 
-Les contributions sont les bienvenues !
+Contributions are welcome!
 
-1. Forkez le projet
-2. Créez votre branche (`git checkout -b feature/AmazingFeature`)
-3. Committez vos changements (`git commit -m 'Add AmazingFeature'`)
-4. Pushez (`git push origin feature/AmazingFeature`)
-5. Ouvrez une Pull Request
+1. Fork the project
+2. Create your branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
+4. Push (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📝 Licence
+## ⚠️ Disclaimer
 
-Distribué sous licence MIT. Voir `LICENSE` pour plus d'informations.
+This project is not affiliated with Spotify or YouTube/Google. Use it responsibly and respect the terms of service of both platforms.
 
-## ⚠️ Avertissement
+## 💖 Acknowledgments
 
-Ce projet n'est pas affilié à Spotify ou YouTube/Google. Utilisez-le de manière responsable et respectez les conditions d'utilisation des deux plateformes.
-
-## 💖 Remerciements
-
-- [spotipy](https://github.com/spotipy-dev/spotipy) - Wrapper Python pour l'API Spotify
-- [ytmusicapi](https://github.com/sigma67/ytmusicapi) - API non-officielle YouTube Music
-- [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) - Interface graphique moderne
+- [spotipy](https://github.com/spotipy-dev/spotipy) - Python wrapper for Spotify API
+- [ytmusicapi](https://github.com/sigma67/ytmusicapi) - Unofficial YouTube Music API
+- [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) - Modern GUI framework
 
 ---
 
 <div align="center">
 
-**⭐ Si ce projet vous a aidé, n'hésitez pas à lui donner une étoile !**
-
-Made with ❤️
+**⭐ If this project helped you, feel free to give it a star!**
 
 </div>
