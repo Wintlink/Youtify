@@ -9,7 +9,7 @@
 
 **Sync your playlists between Spotify and YouTube Music with one click!**
 
-[🚀 Installation](#-installation) • [⚙️ Configuration](#️-configuration) • [📖 Usage](#-usage) 
+[🚀 Installation](#-installation) • [⚙️ Configuration](#️-configuration) • [📖 Usage](#-usage)
 
 </div>
 
@@ -22,6 +22,10 @@
 - 🖥️ **Modern GUI** - Simple and intuitive, no command line needed
 - 💾 **Config saving** - Your credentials are stored locally
 - 📊 **Real-time logging** - Track the sync progress live
+
+You want to create a shared playlist with your friends ? This is the easy and reliable way to do so !
+
+This is one of my first project to be published, so if you have any recommandation or tips I would be happy to hear about it !
 
 ## 📸 Overview
 
@@ -172,10 +176,10 @@ youtify/
 | `ytmusicapi`    | ≥1.11   | YouTube Music API              |
 | `python-dotenv` | ≥1.0    | Environment variables handling |
 
-
 ## ⚠️ Disclaimer
 
 This project is not affiliated with Spotify or YouTube/Google. Use it responsibly and respect the terms of service of both platforms.
+This project was made using help from LLMs and agentic AI for the coding process.
 
 ## 💖 Acknowledgments
 
