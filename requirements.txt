@@ -2,3 +2,4 @@ spotipy>=2.23.0
 python-dotenv>=1.0.0
 ytmusicapi>=1.11.0
 customtkinter>=5.0.0
+Pillow>=10.0.0

@@ -21,6 +21,7 @@ from dotenv import load_dotenv, set_key
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from ytmusicapi import YTMusic
+from PIL import Image
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
@@ -65,6 +66,27 @@ class YoutifyApp(ctk.CTk):
         
         title_container = ctk.CTkFrame(header_frame, fg_color="transparent")
         title_container.pack(side="left")
+        
+        # Load and display logo with original aspect ratio
+        logo_path = os.path.join(os.path.dirname(__file__), "Youtify.png")
+        if os.path.exists(logo_path):
+            try:
+                pil_image = Image.open(logo_path)
+                # Calculate size keeping aspect ratio (max height 60px)
+                max_height = 60
+                ratio = max_height / pil_image.height
+                new_width = int(pil_image.width * ratio)
+                new_height = max_height
+                
+                logo_image = ctk.CTkImage(
+                    light_image=pil_image,
+                    dark_image=pil_image,
+                    size=(new_width, new_height)
+                )
+                logo_label = ctk.CTkLabel(title_container, image=logo_image, text="")
+                logo_label.pack(side="left", padx=(0, 10))
+            except:
+                pass
         
         title_label = ctk.CTkLabel(
             title_container, 
@@ -683,6 +705,34 @@ class YoutifyApp(ctk.CTk):
                 return
             
             done = 0
+            skipped_youtube = 0
+            skipped_spotify = 0
+            
+            # Get existing YouTube video IDs for duplicate check
+            existing_youtube_ids = set()
+            try:
+                yt_playlist = self.youtube_client.get_playlist(youtube_id, limit=5000)
+                for t in yt_playlist.get('tracks', []):
+                    if t and t.get('videoId'):
+                        existing_youtube_ids.add(t['videoId'])
+            except:
+                pass
+            
+            # Get existing Spotify track IDs for duplicate check
+            existing_spotify_ids = set()
+            try:
+                offset = 0
+                while True:
+                    results = self.spotify_client.playlist_tracks(spotify_id, offset=offset, limit=100, fields='items(track(id)),next')
+                    for item in results.get('items', []):
+                        track = item.get('track')
+                        if track and track.get('id'):
+                            existing_spotify_ids.add(track['id'])
+                    if not results.get('next'):
+                        break
+                    offset += 100
+            except:
+                pass
             
             if missing_on_youtube:
                 self.log(f"\n➡️ Adding {len(missing_on_youtube)} tracks to YouTube...")
@@ -691,8 +741,15 @@ class YoutifyApp(ctk.CTk):
                         query = f"{track['name']} {track['artist']}"
                         results = self.youtube_client.search(query, filter="songs", limit=1)
                         if results:
-                            self.youtube_client.add_playlist_items(youtube_id, [results[0]['videoId']])
-                            self.log(f"   ✅ {track['name'][:35]} - {track['artist'][:20]}")
+                            video_id = results[0]['videoId']
+                            # Check for duplicate
+                            if video_id in existing_youtube_ids:
+                                self.log(f"   ⏭️ Skip (duplicate): {track['name'][:35]}")
+                                skipped_youtube += 1
+                            else:
+                                self.youtube_client.add_playlist_items(youtube_id, [video_id])
+                                existing_youtube_ids.add(video_id)
+                                self.log(f"   ✅ {track['name'][:35]} - {track['artist'][:20]}")
                         else:
                             self.log(f"   ⚠️ Not found: {track['name'][:35]}")
                     except Exception as e:
@@ -709,8 +766,15 @@ class YoutifyApp(ctk.CTk):
                         query = f"{track['name']} {track['artist']}"
                         result = self.spotify_client.search(q=query, type='track', limit=1)
                         if result['tracks']['items']:
-                            track_ids.append(result['tracks']['items'][0]['id'])
-                            self.log(f"   ✅ {track['name'][:35]} - {track['artist'][:20]}")
+                            track_id = result['tracks']['items'][0]['id']
+                            # Check for duplicate
+                            if track_id in existing_spotify_ids:
+                                self.log(f"   ⏭️ Skip (duplicate): {track['name'][:35]}")
+                                skipped_spotify += 1
+                            else:
+                                track_ids.append(track_id)
+                                existing_spotify_ids.add(track_id)
+                                self.log(f"   ✅ {track['name'][:35]} - {track['artist'][:20]}")
                         else:
                             self.log(f"   ⚠️ Not found: {track['name'][:35]}")
                     except:
@@ -725,8 +789,14 @@ class YoutifyApp(ctk.CTk):
             
             self.progress_bar.set(1.0)
             self.log("\n" + "=" * 50)
+            
+            # Show skip summary
+            total_skipped = skipped_youtube + skipped_spotify
+            if total_skipped > 0:
+                self.log(f"⏭️ Skipped {total_skipped} duplicates ({skipped_youtube} YouTube, {skipped_spotify} Spotify)")
+            
             self.log("✨ Sync completed!")
-            self.update_status("✨ Sync completed!", SPOTIFY_GREEN)
+            self.update_status(f"✨ Sync completed! ({total_skipped} duplicates skipped)", SPOTIFY_GREEN)
             
             self._load_playlists_thread()
             
