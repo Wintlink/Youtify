@@ -467,9 +467,72 @@ class YoutifyApp(ctk.CTk):
         return tracks
     
     def get_youtube_tracks(self, playlist_id):
-        playlist = self.youtube_client.get_playlist(playlist_id, limit=None)
+        # Custom pagination to handle YouTube Music's new continuation format
+        from ytmusicapi.navigation import nav, TWO_COLUMN_RENDERER, SECTION, CONTENT
+        from ytmusicapi.parsers.playlists import parse_playlist_items
+        
+        browse_id = "VL" + playlist_id if not playlist_id.startswith("VL") else playlist_id
+        body = {"browseId": browse_id}
+        
+        response = self.youtube_client._send_request("browse", body)
+        
+        # Get initial tracks
+        section_list = nav(response, [*TWO_COLUMN_RENDERER, "secondaryContents", *SECTION])
+        content_data = nav(section_list, [*CONTENT, "musicPlaylistShelfRenderer"])
+        
+        all_raw_tracks = []
+        if "contents" in content_data:
+            contents = content_data["contents"]
+            
+            # Parse initial tracks (excluding continuation item)
+            track_items = [c for c in contents if "musicResponsiveListItemRenderer" in c]
+            all_raw_tracks.extend(parse_playlist_items(track_items))
+            
+            # Check for continuation and fetch more
+            while contents:
+                last_item = contents[-1] if contents else None
+                if not last_item or "continuationItemRenderer" not in last_item:
+                    break
+                
+                # Extract continuation token - handle both formats
+                cont_renderer = last_item.get("continuationItemRenderer", {})
+                cont_endpoint = cont_renderer.get("continuationEndpoint", {})
+                
+                token = None
+                
+                # Format 1: Direct continuationCommand (used in continuation responses)
+                if "continuationCommand" in cont_endpoint:
+                    token = cont_endpoint["continuationCommand"].get("token")
+                
+                # Format 2: Nested in commandExecutorCommand (used in initial response)
+                if not token:
+                    commands = cont_endpoint.get("commandExecutorCommand", {}).get("commands", [])
+                    for cmd in commands:
+                        if "continuationCommand" in cmd:
+                            token = cmd["continuationCommand"].get("token")
+                            break
+                
+                if not token:
+                    break
+                
+                # Fetch next batch
+                cont_response = self.youtube_client._send_request("browse", {"continuation": token})
+                cont_items = nav(cont_response, ["onResponseReceivedActions", 0, "appendContinuationItemsAction", "continuationItems"], True)
+                
+                if not cont_items:
+                    break
+                
+                # Parse new tracks
+                track_items = [c for c in cont_items if "musicResponsiveListItemRenderer" in c]
+                if not track_items:
+                    break
+                    
+                all_raw_tracks.extend(parse_playlist_items(track_items))
+                contents = cont_items
+        
+        # Convert to our format
         tracks = []
-        for track in playlist.get('tracks', []):
+        for track in all_raw_tracks:
             if track and track.get('title'):
                 artist = "Unknown"
                 artists = track.get('artists')
@@ -479,6 +542,7 @@ class YoutifyApp(ctk.CTk):
                     "name": track['title'],
                     "artist": artist,
                 })
+        
         return tracks
     
     def find_missing_tracks(self, source, target):
