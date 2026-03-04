@@ -11,6 +11,7 @@ ENV/
 .env
 browser.json
 .cache
+syncs.json
 
 # IDE
 .vscode/

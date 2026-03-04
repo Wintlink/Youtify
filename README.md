@@ -21,7 +21,8 @@
 - 🎯 **Smart detection** - Advanced algorithm to avoid duplicates (even with slightly different titles)
 - 🖥️ **Modern GUI** - Simple and intuitive, no command line needed
 - 💾 **Config saving** - Your credentials are stored locally
-- 📊 **Real-time logging** - Track the sync progress live
+- � **Saved Syncs** - Save your playlist pairs and re-run syncs in one click
+- �📊 **Real-time logging** - Track the sync progress live
 
 You want to create a shared playlist with your friends ? This is the easy and reliable way to do so !
 
@@ -34,6 +35,7 @@ The graphical interface allows you to:
 1. Configure your API credentials once
 2. Paste your playlist links
 3. Click "Synchronize" and you're done!
+4. Saved syncs are listed in the **📁 Saved Syncs** panel — re-run any past sync with one click
 
 ## 🚀 Installation
 
@@ -102,7 +104,6 @@ ytmusicapi browser
 1. **Launch Youtify** (`python youtify.py` or `Youtify.bat`)
 
 2. **Enter your playlist links:**
-
    - Spotify: `https://open.spotify.com/playlist/xxxxx`
    - YouTube Music: `https://music.youtube.com/playlist?list=xxxxx`
 
@@ -161,6 +162,7 @@ youtify/
 ├── youtify.py          # Main application with GUI
 ├── browser.json        # YouTube authentication (to create)
 ├── .env                # Configuration (auto-generated)
+├── syncs.json          # Saved syncs (local only, not pushed to git)
 ├── requirements.txt    # Python dependencies
 ├── Youtify.bat         # Windows launcher
 ├── Youtify.png         # Logo
