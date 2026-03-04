@@ -15,20 +15,20 @@
 
 ---
 
-## ✨ Features
+##  Features
 
-- 🔄 **Bidirectional sync** - Missing tracks are added on both sides
-- 🎯 **Smart detection** - Advanced algorithm to avoid duplicates (even with slightly different titles)
-- 🖥️ **Modern GUI** - Simple and intuitive, no command line needed
-- 💾 **Config saving** - Your credentials are stored locally
-- � **Saved Syncs** - Save your playlist pairs and re-run syncs in one click
-- �📊 **Real-time logging** - Track the sync progress live
+- **Bidirectional sync** - Missing tracks are added on both sides
+- **Smart detection** - Advanced algorithm to avoid duplicates (even with slightly different titles)
+- **Modern GUI** - Simple and intuitive, no command line needed
+-  **Config saving** - Your credentials are stored locally
+- **Saved Syncs** - Save your playlist pairs and re-run syncs in one click
+- **Real-time logging** - Track the sync progress live
 
 You want to create a shared playlist with your friends ? This is the easy and reliable way to do so !
 
 This is one of my first project to be published, so if you have any recommandation or tips I would be happy to hear about it !
 
-## 📸 Overview
+## Overview
 
 The graphical interface allows you to:
 
@@ -37,7 +37,7 @@ The graphical interface allows you to:
 3. Click "Synchronize" and you're done!
 4. Saved syncs are listed in the **📁 Saved Syncs** panel — re-run any past sync with one click
 
-## 🚀 Installation
+##  Installation
 
 ### Prerequisites
 
@@ -183,7 +183,7 @@ youtify/
 This project is not affiliated with Spotify or YouTube/Google. Use it responsibly and respect the terms of service of both platforms.
 This project was made using help from LLMs and agentic AI for the coding process.
 
-## 💖 Acknowledgments
+##  Acknowledgments
 
 - Inspired by [PlaySync](https://github.com/makalin/PlaySync) - Original playlist sync project
 - [spotipy](https://github.com/spotipy-dev/spotipy) - Python wrapper for Spotify API
