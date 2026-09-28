@@ -50,7 +50,7 @@ The graphical interface allows you to:
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/youtify.git
+git clone https://github.com/Wintlink/Youtify.git
 cd youtify
 ```
 
