@@ -1,3 +1,3 @@
 @echo off
 cd /d "%~dp0"
-start "" pythonw youtify.py
+start "" python youtify.py
